@@ -5,8 +5,8 @@
 **Alunas:** Érika Mara de Morais Machado e Veronica Rodrigues da Silva França  
 **Universidade Federal de Lavras (UFLA)** 
 
-## 📌 Sobre o Projeto
-Este projeto tem como objetivo a manipulação e análise de grafos aplicados a problemas de logística. Ele permite a leitura de instâncias no formato `.dat`, a construção da estrutura do grafo e a extração de métricas e estatísticas para apoiar a resolução de problemas logísticos.
+## 📌 Sobre o Projeto - Etapa 1
+De início, a Etapa 1 deste projeto tem como objetivo a manipulação e análise de grafos aplicados a problemas de logística. Ele permite a leitura de instâncias no formato `.dat`, a construção da estrutura do grafo e a extração de métricas e estatísticas para apoiar a resolução de problemas logísticos.
 
 ## 📌 Definição do Problema
 
