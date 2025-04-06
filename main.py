@@ -2,6 +2,7 @@ from src.Grafos import Grafo
 from src.utils.leitura_dados import parse_file_into_grafo
 from src.algorithms.estatisticas import calcular_estatisticas, calcular_caminho_medio, calcular_diametro, calcular_intermediacao
 from src.algorithms.floyd_warshall import floyd_warshall
+from src.utils.visualizacao import desenhar_grafo
 import os
 
 def processar_arquivo(arquivo):
@@ -10,7 +11,7 @@ def processar_arquivo(arquivo):
     grafo = parse_file_into_grafo(arquivo)
 
     if not grafo:
-        print(f"⚠️ Erro: O arquivo {arquivo} não contém dados válidos.")
+        print(f"⚠ Erro: O arquivo {arquivo} não contém dados válidos.")
         return
 
     print(f"✅ Grafo de {arquivo} carregado com sucesso!")
@@ -31,6 +32,8 @@ def processar_arquivo(arquivo):
     intermediacoes = calcular_intermediacao(dist, pred)
     intermediacao_dict = {i: valor for i, valor in enumerate(intermediacoes, 1)}
     print(f"  Intermediação: {intermediacao_dict}")
+    desenhar_grafo(grafo, titulo=f"Grafo - {os.path.basename(arquivo).replace('.dat', '')}")
+
 
         
 def main():
@@ -41,5 +44,5 @@ def main():
     for arquivo in arquivos:
         processar_arquivo(os.path.join(pasta_arquivos, arquivo))
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     main()
