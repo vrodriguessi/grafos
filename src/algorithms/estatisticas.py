@@ -1,25 +1,74 @@
-def calcular_estatisticas(grafo):
-    num_vertices = len(grafo.vertices)
-    num_arestas = len(grafo.arestas) // 2 
-    num_arcos = len(grafo.arcos)
-    num_vertices_requeridos = len(grafo.vertices) 
-    num_arestas_requeridas = num_arestas
-    num_arcos_requeridos = num_arcos
+def calcular_estatisticas(ReA, ARC, ReE, EDGE, ReN):
+    # Junta todos os vértices usados
+    num_vertices = set()
+    for u, v, _ in ReA + ARC + ReE + EDGE:
+        num_vertices.add(u)
+        num_vertices.add(v)
+    num_vertices.update(ReN)  # Garante que nós obrigatórios também são contados
 
-    graus = [len(grafo.obter_vizinhos(v)) for v in grafo.vertices]
-    grau_min = min(graus)
-    grau_max = max(graus)
+    num_vertices_total = len(num_vertices)
+    num_arcos_total = len(ReA) + len(ARC)
+    num_arestas_total = len(ReE) + len(EDGE)
 
-    densidade = (2 * num_arestas) / (num_vertices * (num_vertices - 1)) if num_vertices > 1 else 0
+    # Inicializa grau de entrada e saída com 0 para todos os vértices
+    grau_in = {v: 0 for v in num_vertices}
+    grau_out = {v: 0 for v in num_vertices}
+
+    # Arestas são bidirecionais: contam como entrada e saída para ambos
+    for u, v, _ in ReE + EDGE:
+        grau_in[u] += 1
+        grau_out[u] += 1
+        grau_in[v] += 1
+        grau_out[v] += 1
+
+    # Arcos são direcionais: saída do u, entrada no v
+    for u, v, _ in ReA + ARC:
+        grau_out[u] += 1
+        grau_in[v] += 1
+
+    # Grau total por vértice = grau de entrada + grau de saída
+    grau_total = {v: grau_in[v] + grau_out[v] for v in num_vertices}
+    grau_min = min(grau_total.values()) if grau_total else 0
+    grau_max = max(grau_total.values()) if grau_total else 0
+
+    # Densidade considerando arcos e arestas
+    densidade = (num_arcos_total + num_arestas_total) / (num_vertices_total * (num_vertices_total - 1)) if num_vertices_total > 1 else 0
 
     return {
-        "Quantidade de vértices": num_vertices,
-        "Quantidade de arestas": num_arestas,
-        "Quantidade de arcos": num_arcos,
-        "Quantidade de vértices requeridos": num_vertices_requeridos,
-        "Quantidade de arestas requeridas": num_arestas_requeridas,
-        "Quantidade de arcos requeridos": num_arcos_requeridos,
+        "Quantidade de vértices": num_vertices_total,
+        "Quantidade de arestas obrigatórias": len(ReE),
+        "Quantidade de arestas opcionais": len(EDGE),
+        "Quantidade total de arestas": num_arestas_total,
+        "Quantidade de arcos obrigatórios": len(ReA),
+        "Quantidade de arcos opcionais": len(ARC),
+        "Quantidade total de arcos": num_arcos_total,
+        "Quantidade de nós obrigatórios": len(ReN),
         "Grau mínimo dos vértices": grau_min,
         "Grau máximo dos vértices": grau_max,
         "Densidade do grafo": densidade
     }
+
+def calcular_caminho_medio(dist):
+    total = 0
+    count = 0
+
+    n = len(dist)
+
+    for i in range(n):
+        for j in range(n):
+            if i != j and dist[i][j] != float('inf'):
+                total += dist[i][j]
+                count += 1
+
+    return total / count if count != 0 else 0
+
+def calcular_diametro(dist):
+    diametro = 0
+    n = len(dist)
+
+    for i in range(n):
+        for j in range(n):
+            if i != j and dist[i][j] != float('inf'):
+                diametro = max(diametro, dist[i][j])
+
+    return diametro

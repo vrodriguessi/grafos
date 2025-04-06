@@ -1,90 +1,139 @@
-import os
-from src.models.grafos import Grafo
+import re
 
-def carregar_grafo(caminho_arquivo=None):
-    grafo = Grafo()
+def parse_arcos(lines):
+    arcos = []
+    arc_section = False
 
-    if caminho_arquivo is None:
-        caminho_arquivo = input("Por favor, forneça o caminho do arquivo .dat: ").strip()
+    for line in lines:
+        line = line.strip()
 
-        if not os.path.exists(caminho_arquivo):
-            print(f"Erro: o arquivo {caminho_arquivo} não foi encontrado.")
-            return None
+        if re.match(r'^ReA\.', line):
+            arc_section = True
+            continue
+        elif line == "":
+            arc_section = False
+            continue
 
-    with open(caminho_arquivo, 'r') as f:
-        section = None
-        for linha in f:
-            linha = linha.strip()
+        if arc_section:
+            parts = re.split(r'\s+', line)
+            if len(parts) >= 4 and parts[1].isdigit() and parts[2].isdigit() and parts[3].isdigit():
+                from_node = int(parts[1])
+                to_node = int(parts[2])
+                cost = int(parts[3])
+                arcos.append((from_node, to_node, cost))
 
-            if not linha or linha.startswith("#"):
-                continue 
+    return arcos
 
-            # Identificação da seção
-            if linha.startswith("ReN."):
-                section = "ReN"
-            elif linha.startswith("ReE."):
-                section = "ReE"
-            elif linha.startswith("ReA."):
-                section = "ReA"
-            elif linha.startswith("EDGE"):
-                section = "EDGE"
-            elif linha.startswith("ARC"):
-                section = "ARC"
+def parse_arestas(lines):
+    arestas = []
+    edge_section = False
 
-            # Processamento das seções
-            if section == "ReN":
-                processar_ReN(linha, grafo)
-            elif section == "ReE":
-                if linha.startswith('E'):  # As linhas de dados começam com 'E' seguido de número
-                    processar_ReE(linha, grafo)
-            elif section == "ReA":
-                if linha.startswith('A'):  # As linhas de dados começam com 'A' seguido de número
-                    processar_ReA(linha, grafo)
-            elif section == "EDGE":
-                if linha.startswith('E'):  # As linhas de dados começam com 'E' seguido de número
-                    processar_EDGE(linha, grafo)
-            elif section == "ARC":
-                if linha.startswith('NrA'):  # As linhas de dados começam com 'NrA' seguido de número
-                    processar_ARC(linha, grafo)
+    for line in lines:
+        line = line.strip()
 
-    return grafo
+        if re.match(r'^ARC', line):
+            edge_section = True
+            continue
+        elif line == "":
+            edge_section = False
+            continue
 
-def processar_ReN(linha, grafo):
-    dados = linha.split()
-    if len(dados) == 3: 
-        nodo = dados[0]
-        grafo.adicionar_vertice(nodo) 
+        if edge_section:
+            parts = re.split(r'\s+', line)
+            if len(parts) >= 4 and parts[1].isdigit() and parts[2].isdigit() and parts[3].isdigit():
+                from_node = int(parts[1])
+                to_node = int(parts[2])
+                cost = int(parts[3])
+                arestas.append((from_node, to_node, cost))
 
-def processar_ReE(linha, grafo):
-    dados = linha.split()
-    if len(dados) == 6: 
-        de = dados[1]
-        para = dados[2]
-        custo = int(dados[3])
-        demanda = int(dados[4])
-        grafo.adicionar_aresta(de, para, custo, demanda)
+    return arestas
 
-def processar_ReA(linha, grafo):
-    dados = linha.split()
-    if len(dados) == 6: 
-        de = dados[1]
-        para = dados[2]
-        custo = int(dados[3])
-        demanda = int(dados[4])
-        grafo.adicionar_arco(de, para, custo, demanda)
+def parse_rees(lines):
+    ree = []
+    ree_section = False
 
-def processar_EDGE(linha, grafo):
-    dados = linha.split()
-    if len(dados) == 5: 
-        de = dados[1]
-        para = dados[2]
-        custo = int(dados[3])
-        grafo.adicionar_aresta(de, para, custo, 0)  
+    for line in lines:
+        line = line.strip()
 
-def processar_ARC(linha, grafo):
-    dados = linha.split()
-    if len(dados) == 4: 
-        de = dados[1]
-        para = dados[2]
-        custo = int(dados[3])
-        grafo.adicionar_arco(de, para, custo, 0) 
+        if re.match(r'^ReE\.', line):
+            ree_section = True
+            continue
+        elif line == "":
+            ree_section = False
+            continue
+
+        if ree_section:
+            parts = re.split(r'\s+', line)
+            if len(parts) >= 4 and parts[1].isdigit() and parts[2].isdigit() and parts[3].isdigit():
+                from_node = int(parts[1])
+                to_node = int(parts[2])
+                cost = int(parts[3])
+                ree.append((from_node, to_node, cost))
+
+    return ree
+
+def parse_edges(lines):
+    edges = []
+    edge_section = False
+
+    for line in lines:
+        line = line.strip()
+
+        if re.match(r'^EDGE', line):
+            edge_section = True
+            continue
+        elif line == "":
+            edge_section = False
+            continue
+
+        if edge_section:
+            parts = re.split(r'\s+', line)
+            if len(parts) >= 4 and parts[1].isdigit() and parts[2].isdigit() and parts[3].isdigit():
+                from_node = int(parts[1])
+                to_node = int(parts[2])
+                cost = int(parts[3])
+                edges.append((from_node, to_node, cost))
+
+    return edges
+
+def parse_ren(lines):
+    ren = []
+    ren_section = False
+
+    for line in lines:
+        line = line.strip()
+
+        if re.match(r'^ReN\.', line):
+            ren_section = True
+            continue
+        elif line == "":
+            ren_section = False
+            continue
+
+        if ren_section:
+            parts = re.split(r'\s+', line)
+            if len(parts) >= 1 and re.match(r'^N\d+$', parts[0]):
+                node_number = int(parts[0][1:])  # Remove o "N" e converte para inteiro
+                ren.append(node_number)
+
+    return ren
+
+def parse_file(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            lines = file.readlines()
+
+        ReA = parse_arcos(lines)     # ReA.
+        ARC = parse_arestas(lines) # ARC
+        ReE = parse_rees(lines)        # ReE.
+        EDGE = parse_edges(lines)      # EDGE
+        ReN = parse_ren(lines)         # ReN.
+
+        return ReA, ARC, ReE, EDGE, ReN
+
+    except FileNotFoundError:
+        print(f"Erro: O arquivo {file_path} não foi encontrado.")
+        return [], [], [], [], []
+    except Exception as e:
+        print(f"Erro ao processar o arquivo {file_path}: {e}")
+        return [], [], [], [], []

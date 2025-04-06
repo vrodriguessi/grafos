@@ -1,35 +1,38 @@
-from src.utils.leitura_dados import carregar_grafo
-from src.algorithms.estatisticas import calcular_estatisticas
+from src.utils.leitura_dados import parse_file
+from src.algorithms.estatisticas import calcular_estatisticas, calcular_caminho_medio, calcular_diametro
 from src.algorithms.floyd_warshall import floyd_warshall
 from src.algorithms.componentes import encontrar_componentes
 import os
 
 def processar_arquivo(arquivo):
-    print(f"Processando o arquivo {arquivo}...")
+    print(f"📂 Processando o arquivo {arquivo}...\n")
     
-    grafo = None
-    
-    # Aguarda até que o grafo seja carregado corretamente
-    print(f"Aguardando o carregamento do grafo de {arquivo}...")  # Imprime apenas uma vez
-    while grafo is None or not grafo.vertices:
-        grafo = carregar_grafo(arquivo)  # Tenta carregar o grafo para o arquivo específico
-    
-    # Agora que o grafo está carregado, calcule as estatísticas e execute as operações
-    print(f"Grafo de {arquivo} carregado com sucesso!")
+    # Carrega o grafo
+    ReA, ARC, ReE, EDGE, ReN = parse_file(arquivo)
 
-    estatisticas = calcular_estatisticas(grafo)
-    matriz_caminhos = floyd_warshall(grafo)
-    componentes = encontrar_componentes(grafo)
+    # Verifica se os dados são válidos
+    if not ReA and not ARC:
+        print(f"⚠️ Erro: O arquivo {arquivo} não contém dados válidos.")
+        return
 
-    # Exibe as estatísticas do grafo carregado
+    print(f"✅ Grafo de {arquivo} carregado com sucesso!")
+
+    # Calcula as estatísticas e executa os algoritmos
+    estatisticas = calcular_estatisticas(ReA, ARC, ReE, EDGE, ReN)
+    dist, pred = floyd_warshall(ReA, ARC, ReE, EDGE, ReN)
+    componentes = encontrar_componentes(ReA, ARC, ReE, EDGE, ReN)
+
+    caminho_medio = calcular_caminho_medio(dist)
+    diametro = calcular_diametro(dist)
+
+    # Exibe os resultados
     print(f"\n📊 Estatísticas do Grafo {arquivo}:")
     for chave, valor in estatisticas.items():
-        print(f"{chave}: {valor}")
-
-    print("\n🔗 Componentes Conectados:")
-    for i, comp in enumerate(componentes, 1):
-        print(f"Componente {i}: {comp}")
+        print(f"  {chave}: {valor}")
     
+    print(f"Caminho médio: {caminho_medio}")
+    print(f"Diametro: {diametro}")
+
 def main():
     # Caminho para os arquivos
     pasta_arquivos = "C:/Projetos/Grafos/data/selected_instances/"
