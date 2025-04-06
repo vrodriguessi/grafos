@@ -78,6 +78,8 @@ python main.py
 📁 root/
 ├── 📁 data/
 │   └── 📁 selected_instances/            # Instâncias em formato `.dat` com os dados de entrada
+│       ├── 📄 BHW1.dat
+│       ├── 📄 BHW2.dat
 │       ├── 📄 BHW3.dat
 │       ├── 📄 BHW4.dat
 │       ├── 📄 BHW5.dat
