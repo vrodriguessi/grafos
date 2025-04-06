@@ -1,7 +1,13 @@
-def calcular_estatisticas(ReA, ARC, ReE, EDGE, ReN):
+def calcular_estatisticas(grafo):
+    ReA = grafo.ReA
+    ARC = grafo.ARC
+    ReE = grafo.ReE
+    EDGE = grafo.EDGE
+    ReN = grafo.ReN
+
     # Junta todos os vértices usados
     num_vertices = set()
-    for u, v, _ in ReA + ARC + ReE + EDGE:
+    for u, v, *_ in ReA + ARC + ReE + EDGE:
         num_vertices.add(u)
         num_vertices.add(v)
     num_vertices.update(ReN)  # Garante que nós obrigatórios também são contados
@@ -15,14 +21,14 @@ def calcular_estatisticas(ReA, ARC, ReE, EDGE, ReN):
     grau_out = {v: 0 for v in num_vertices}
 
     # Arestas são bidirecionais: contam como entrada e saída para ambos
-    for u, v, _ in ReE + EDGE:
+    for u, v, *_ in ReE + EDGE:
         grau_in[u] += 1
         grau_out[u] += 1
         grau_in[v] += 1
         grau_out[v] += 1
 
     # Arcos são direcionais: saída do u, entrada no v
-    for u, v, _ in ReA + ARC:
+    for u, v, *_ in ReA + ARC:
         grau_out[u] += 1
         grau_in[v] += 1
 
@@ -42,7 +48,7 @@ def calcular_estatisticas(ReA, ARC, ReE, EDGE, ReN):
         "Quantidade de arcos obrigatórios": len(ReA),
         "Quantidade de arcos opcionais": len(ARC),
         "Quantidade total de arcos": num_arcos_total,
-        "Quantidade de nós obrigatórios": len(ReN),
+        "Quantidade de nós obrigatórios": len(grafo.ReN),
         "Grau mínimo dos vértices": grau_min,
         "Grau máximo dos vértices": grau_max,
         "Densidade do grafo": densidade

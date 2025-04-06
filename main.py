@@ -1,26 +1,27 @@
-from src.utils.leitura_dados import parse_file
+from src.Grafos import Grafo
+from src.utils.leitura_dados import parse_file_into_grafo
 from src.algorithms.estatisticas import calcular_estatisticas, calcular_caminho_medio, calcular_diametro
 from src.algorithms.floyd_warshall import floyd_warshall
-from src.algorithms.componentes import encontrar_componentes
+# from src.algorithms.componentes import encontrar_componentes
 import os
 
 def processar_arquivo(arquivo):
     print(f"📂 Processando o arquivo {arquivo}...\n")
     
     # Carrega o grafo
-    ReA, ARC, ReE, EDGE, ReN = parse_file(arquivo)
+    grafo = parse_file_into_grafo(arquivo)
 
     # Verifica se os dados são válidos
-    if not ReA and not ARC:
+    if not grafo:
         print(f"⚠️ Erro: O arquivo {arquivo} não contém dados válidos.")
         return
 
     print(f"✅ Grafo de {arquivo} carregado com sucesso!")
 
     # Calcula as estatísticas e executa os algoritmos
-    estatisticas = calcular_estatisticas(ReA, ARC, ReE, EDGE, ReN)
-    dist, pred = floyd_warshall(ReA, ARC, ReE, EDGE, ReN)
-    componentes = encontrar_componentes(ReA, ARC, ReE, EDGE, ReN)
+    estatisticas = calcular_estatisticas(grafo)
+    dist, pred = floyd_warshall(grafo)
+    # componentes = encontrar_componentes(grafo)
 
     caminho_medio = calcular_caminho_medio(dist)
     diametro = calcular_diametro(dist)
@@ -30,8 +31,8 @@ def processar_arquivo(arquivo):
     for chave, valor in estatisticas.items():
         print(f"  {chave}: {valor}")
     
-    print(f"Caminho médio: {caminho_medio}")
-    print(f"Diametro: {diametro}")
+    print(f"  Caminho médio: {caminho_medio}")
+    print(f"  Diametro: {diametro}")
 
 def main():
     # Caminho para os arquivos
