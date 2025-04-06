@@ -104,17 +104,14 @@ def parse_ren(lines):
     for line in lines:
         line = line.strip()
 
-        # Começo da seção ReN
         if re.match(r'^ReN\.', line):
             ren_section = True
             continue
 
-        # Se começou uma nova seção, encerra ReN
         if re.match(r'^(ReE\.|ReA\.|EDGE|ARC)', line):
             ren_section = False
 
         if ren_section:
-            # Confirma que a linha é só tipo "N4\t1\t1"
             parts = re.split(r'\s+', line)
             if len(parts) >= 1 and re.fullmatch(r'N\d+', parts[0]):
                 node_number = int(parts[0][1:])
@@ -138,22 +135,16 @@ def parse_file_into_grafo(file_path):
         with open(file_path, 'r', encoding='utf-8') as file:
             lines = file.readlines()
 
-        # Primeiro, extrair todas as listas separadas para calcular o número de vértices
         ReA = parse_arcos_obrigatorios(lines)     # ReA.
         ARC = parse_arcos_nao_obrigatorios(lines)   # ARC
         ReE = parse_rees(lines)      # ReE.
         EDGE = parse_edges(lines)    # EDGE
         ReN = parse_ren(lines)       # ReN.
 
-        print(f"{ReN}")
-
-        # Calcular número de vértices
         num_vertices = calcular_num_vertices(ReA, ARC, ReE, EDGE, ReN)
 
-        # Criar o grafo
         grafo = Grafo(num_vertices)
 
-        # Adicionar dados ao grafo
         for u, v, custo in ReA:
             grafo.adicionar_arco_obrigatorio(u, v, custo, demanda=0)
 

@@ -5,39 +5,33 @@ def calcular_estatisticas(grafo):
     EDGE = grafo.EDGE
     ReN = grafo.ReN
 
-    # Junta todos os vértices usados
     num_vertices = set()
     for u, v, *_ in ReA + ARC + ReE + EDGE:
         num_vertices.add(u)
         num_vertices.add(v)
-    num_vertices.update(ReN)  # Garante que nós obrigatórios também são contados
+    num_vertices.update(ReN) 
 
     num_vertices_total = len(num_vertices)
     num_arcos_total = len(ReA) + len(ARC)
     num_arestas_total = len(ReE) + len(EDGE)
 
-    # Inicializa grau de entrada e saída com 0 para todos os vértices
     grau_in = {v: 0 for v in num_vertices}
     grau_out = {v: 0 for v in num_vertices}
 
-    # Arestas são bidirecionais: contam como entrada e saída para ambos
     for u, v, *_ in ReE + EDGE:
         grau_in[u] += 1
         grau_out[u] += 1
         grau_in[v] += 1
         grau_out[v] += 1
 
-    # Arcos são direcionais: saída do u, entrada no v
     for u, v, *_ in ReA + ARC:
         grau_out[u] += 1
         grau_in[v] += 1
 
-    # Grau total por vértice = grau de entrada + grau de saída
     grau_total = {v: grau_in[v] + grau_out[v] for v in num_vertices}
     grau_min = min(grau_total.values()) if grau_total else 0
     grau_max = max(grau_total.values()) if grau_total else 0
 
-    # Densidade considerando arcos e arestas
     densidade = (num_arcos_total + num_arestas_total) / (num_vertices_total * (num_vertices_total - 1)) if num_vertices_total > 1 else 0
 
     return {
@@ -78,3 +72,22 @@ def calcular_diametro(dist):
                 diametro = max(diametro, dist[i][j])
 
     return diametro
+
+def calcular_intermediacao(dist_matrix, pred_matrix):
+    n = len(dist_matrix)
+    intermediacao = [0 for _ in range(n)] 
+
+    for s in range(n):
+        for t in range(n):
+            if s == t:
+                continue
+            caminho = []
+            atual = t
+            while pred_matrix[s][atual] is not None and atual != s:
+                caminho.append(pred_matrix[s][atual])
+                atual = pred_matrix[s][atual] - 1
+            for v in caminho:
+                if v - 1 != s and v - 1 != t:
+                    intermediacao[v - 1] += 1
+
+    return intermediacao
