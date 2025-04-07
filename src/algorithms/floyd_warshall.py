@@ -18,3 +18,11 @@ def floyd_warshall(grafo):
                     pred[i][j] = pred[k][j]
 
     return dist, pred
+
+def obter_matriz_distancias(grafo):
+    distancias, _ = floyd_warshall(grafo)
+    return distancias
+
+def obter_matriz_predecessores(grafo):
+    _, predecessores = floyd_warshall(grafo)
+    return predecessores
