@@ -4,6 +4,7 @@ from src.algorithms.estatisticas import calcular_estatisticas, calcular_caminho_
 from src.algorithms.floyd_warshall import floyd_warshall, obter_matriz_distancias, obter_matriz_predecessores
 from src.utils.visualizacao import desenhar_grafo
 from src.utils.visualizacao_matrizes import imprimir_matrizes
+import argparse
 import os
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
@@ -44,13 +45,17 @@ def processar_arquivo(arquivo):
 
         
 def main():
-    pasta_arquivos = "data/selected_instances/"
-    
-    arquivos = [f for f in os.listdir(pasta_arquivos) if f.endswith(".dat")]
-    
-    for arquivo in arquivos:
-        processar_arquivo(os.path.join(pasta_arquivos, arquivo))
+    parser = argparse.ArgumentParser(description="Processa um arquivo .dat específico na pasta padrão.")
+    parser.add_argument("nome_arquivo", help="Nome do arquivo .dat (ex: grafo01.dat)")
+
+    args = parser.parse_args()
+    pasta_arquivos = "C:/Projetos/Grafos/data/selected_instances/"
+    caminho_arquivo = os.path.join(pasta_arquivos, args.nome_arquivo)
+
+    if os.path.isfile(caminho_arquivo):
+        processar_arquivo(caminho_arquivo)
+    else:
+        print(f"Arquivo '{args.nome_arquivo}' não encontrado na pasta '{pasta_arquivos}'.")
 
 if __name__ == "__main__":
     main()
-
