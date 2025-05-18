@@ -17,11 +17,12 @@ def parse_arcos_obrigatorios(lines):
 
         if arc_section:
             parts = re.split(r'\s+', line)
-            if len(parts) >= 4 and parts[1].isdigit() and parts[2].isdigit() and parts[3].isdigit():
+            if len(parts) >= 5 and parts[1].isdigit() and parts[2].isdigit() and parts[3].isdigit() and parts[4].isdigit():
                 from_node = int(parts[1])
                 to_node = int(parts[2])
                 cost = int(parts[3])
-                arcos.append((from_node, to_node, cost))
+                demanda = int(parts[4])
+                arcos.append((from_node, to_node, cost, demanda))
 
     return arcos
 
@@ -65,11 +66,12 @@ def parse_rees(lines):
 
         if ree_section:
             parts = re.split(r'\s+', line)
-            if len(parts) >= 4 and parts[1].isdigit() and parts[2].isdigit() and parts[3].isdigit():
+            if len(parts) >= 5 and parts[1].isdigit() and parts[2].isdigit() and parts[3].isdigit() and parts[4].isdigit():
                 from_node = int(parts[1])
                 to_node = int(parts[2])
                 cost = int(parts[3])
-                ree.append((from_node, to_node, cost))
+                demanda = int(parts[4])
+                ree.append((from_node, to_node, cost, demanda))
 
     return ree
 
@@ -122,7 +124,8 @@ def parse_ren(lines):
 def calcular_num_vertices(ReA, ARC, ReE, EDGE, ReN):
     vertices = set()
 
-    for u, v, _ in ReA + ARC + ReE + EDGE:
+    for item in ReA + ARC + ReE + EDGE:
+        u, v = item[0], item[1] 
         vertices.add(u)
         vertices.add(v)
 
@@ -164,11 +167,11 @@ def parse_file_into_grafo(file_path):
 
         grafo = Grafo(num_vertices)
 
-        for u, v, custo in ReA:
-            grafo.adicionar_arco_obrigatorio(u, v, custo, demanda=0)
+        for u, v, custo, demanda in ReA:
+            grafo.adicionar_arco_obrigatorio(u, v, custo, demanda)
 
-        for u, v, custo in ReE:
-            grafo.adicionar_aresta_obrigatoria(u, v, custo, demanda=0)
+        for u, v, custo, demanda in ReE:
+            grafo.adicionar_aresta_obrigatoria(u, v, custo, demanda)
 
         for u, v, custo in ARC:
             grafo.adicionar_arco_nao_obrigatorio(u, v, custo, demanda=0)
