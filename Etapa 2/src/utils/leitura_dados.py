@@ -138,7 +138,7 @@ def parse_capacidade(file_path):
         for line in lines:
             line = line.strip()
             if line.startswith("Capacity:"):
-                capacidade = int(line.split(":")[1].strip())  # O strip() remove espaços ao redor do valor
+                capacidade = int(line.split(":")[1].strip())
                 return capacidade
         return None 
 
@@ -178,6 +178,9 @@ def parse_file_into_grafo(file_path):
 
         for no in ReN:
             grafo.adicionar_no_obrigatorio(no)
+        
+        capacidade = parse_capacidade(file_path)
+        grafo.capacidade = capacidade
 
         return grafo
 

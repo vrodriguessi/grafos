@@ -21,7 +21,7 @@ def processar_arquivo(arquivo):
     capacidade_veiculo = parse_capacidade(arquivo)
     
     start_clocks = time.process_time()
-    solucao = path_scanning(grafo, capacidade_veiculo, deposito=1)
+    solucao = path_scanning(grafo, deposito=1)
     end_clocks = time.process_time()
 
     tempo_execucao = end_clocks - start_clocks

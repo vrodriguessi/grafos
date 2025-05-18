@@ -12,28 +12,19 @@ def salvar_resultado_path_scanning(solucao, tempo_total, tempo_encontrar_solucao
             custo = rota["custo"]
             visitas = rota["detalhes"]
 
-            # total de visitas = depósito (1 a mais) + serviços (n)
-            total_visitas = 1 + len(visitas)
-
-            # índice do depósito sempre 0, dia 1, identificador da rota começa em 1
+            total_visitas = len(visitas)
             f.write(f"0 1 {idx_rota} {demanda} {custo} {total_visitas}")
 
-            # imprime a visita ao depósito inicial
-            f.write(" (D 0,1,1)")
-
-            # agora imprime as visitas aos serviços
             for visita in visitas:
-                serv = visita["servico"]
-                tipo = serv["tipo"]
+                servico = visita["servico"]
+                tipo = servico["tipo"]
 
-                if tipo == "aresta" or tipo == "arco":
-                    # (S id_serviço, extremidade1, extremidade2)
-                    # Presumo que id_serviço seja algum identificador, 
-                    # se você tiver algum id do serviço, use ele. Se não, pode usar a posição na lista.
-                    # Como não tem id explícito, pode usar o índice na lista + 1 como id.
-                    id_servico = solucao.index(rota) + 1  # ou outro id que você tenha
-                    # Melhor pegar a posição da visita dentro da rota:
-                    id_servico = visitas.index(visita) + 1
-                    f.write(f" (S {id_servico},{serv['origem']},{serv['destino']})")
+                if tipo == "D":
+                    f.write(f" (D 0,1,1)")
+                elif tipo in ("aresta", "arco"):
+                    id_servico = servico["id"]
+                    origem = servico["origem"]
+                    destino = servico["destino"]
+                    f.write(f" (S {id_servico},{origem},{destino})")
 
             f.write("\n")

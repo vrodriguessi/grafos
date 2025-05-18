@@ -6,6 +6,7 @@ class Grafo:
         self.num_arcos = 0
         self.num_arestas_req = 0
         self.num_arcos_req = 0
+        self.capacidade = 0
 
         self.EDGE = []     # Arestas não obrigatórias
         self.ReE = []      # Arestas obrigatórias
