@@ -168,15 +168,13 @@ def parse_file_into_grafo(file_path):
             grafo.adicionar_arco_obrigatorio(u, v, custo, demanda=0)
 
         for u, v, custo in ReE:
-            grafo.adicionar_arco_obrigatorio(u, v, custo, demanda=0)
-            grafo.adicionar_arco_obrigatorio(v, u, custo, demanda=0)
+            grafo.adicionar_aresta_obrigatoria(u, v, custo, demanda=0)
 
         for u, v, custo in ARC:
             grafo.adicionar_arco_nao_obrigatorio(u, v, custo, demanda=0)
 
         for u, v, custo in EDGE:
-            grafo.adicionar_arco_nao_obrigatorio(u, v, custo, demanda=0)
-            grafo.adicionar_arco_nao_obrigatorio(v, u, custo, demanda=0)
+            grafo.adicionar_aresta_nao_obrigatoria(u, v, custo, demanda=0)
 
         for no in ReN:
             grafo.adicionar_no_obrigatorio(no)

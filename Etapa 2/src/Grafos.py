@@ -45,19 +45,3 @@ class Grafo:
 
     def adicionar_no_obrigatorio(self, no):
         self.ReN.add(no)
-
-    def calcular_matriz_distancia_minima(self):
-        dist, _ = floyd_warshall(self)
-        self.matriz_dist_min = dist
-        
-    def distancia(self, u, v):
-        return self.matriz_dist_min[u-1][v-1]
-
-    def get_arcos_obrigatorios(self):
-        arcos = []
-        for u, v, custo, demanda in self.ReA:
-            arcos.append((u, v, custo, demanda))
-        for u, v, custo, demanda in self.ReE:
-            arcos.append((u, v, custo, demanda))  # considere como arco de u→v
-            arcos.append((v, u, custo, demanda))  # e v→u (aresta = dois arcos)
-        return arcos

@@ -1,43 +1,75 @@
-def path_scanning(grafo, capacidade_veiculo, deposito=1):
-    grafo.calcular_matriz_distancia_minima()
-    arcos_servico = grafo.get_arcos_obrigatorios()
-    visitados = set()
-    rotas = []
+from copy import deepcopy
+from src.algorithms.floyd_warshall import floyd_warshall
 
-    while len(visitados) < len(arcos_servico):
+def path_scanning(grafo, capacidade_veiculo, deposito=1):
+    dist, _ = floyd_warshall(grafo) 
+
+    servicos_pendentes = []
+    for u, v, custo, demanda in grafo.ReE: 
+        servicos_pendentes.append({
+            "tipo": "aresta",
+            "origem": u,
+            "destino": v,
+            "custo": custo,
+            "demanda": demanda,
+            "atendido": False
+        })
+    for u, v, custo, demanda in grafo.ReA:
+        servicos_pendentes.append({
+            "tipo": "arco",
+            "origem": u,
+            "destino": v,
+            "custo": custo,
+            "demanda": demanda,
+            "atendido": False
+        })
+
+    solucao = []
+
+    while any(not s["atendido"] for s in servicos_pendentes):
+        rota = [deposito] 
         carga = 0
-        custo_rota = 0
-        rota = []
-        posicao_atual = deposito
+        custo = 0
+        servicos_rota = []
+        detalhes_visitas = []
+
+        no_atual = deposito
 
         while True:
-            candidatos = []
-
-            for idx, (u, v, custo, demanda) in enumerate(arcos_servico):
-                if idx in visitados:
-                    continue
-                if demanda + carga > capacidade_veiculo:
-                    continue
-
-                dist = grafo.distancia(posicao_atual, u)
-                candidatos.append((dist, idx, u, v, custo, demanda))
-
+            candidatos = [s for s in servicos_pendentes if not s["atendido"] and s["demanda"] + carga <= capacidade_veiculo]
             if not candidatos:
                 break
 
-            candidatos.sort() 
-            _, idx, u, v, custo, demanda = candidatos[0]
-            carga += demanda
-            custo_rota += grafo.distancia(posicao_atual, u) + custo
-            rota.append((u, v))
-            posicao_atual = v
-            visitados.add(idx)
+            candidatos.sort(key=lambda s: dist[no_atual-1][s["origem"]-1])
+            proximo = candidatos[0]
 
-        custo_rota += grafo.distancia(posicao_atual, deposito)
-        rotas.append({
-            'rota': rota,
-            'carga': carga,
-            'custo': custo_rota
+            custo_ate_servico = dist[no_atual-1][proximo["origem"]-1]
+            custo_servico = proximo["custo"]
+            custo += custo_ate_servico + custo_servico
+
+            rota.append(proximo["origem"])
+            rota.append(proximo["destino"]) 
+            carga += proximo["demanda"]
+            servicos_rota.append(proximo)
+            detalhes_visitas.append({
+                "servico": proximo,
+                "custo_ate_servico": custo_ate_servico,
+                "custo_servico": custo_servico,
+                "carga_atual": carga
+            })
+
+            no_atual = proximo["destino"]
+            proximo["atendido"] = True
+
+        custo += dist[no_atual-1][deposito-1]
+        rota.append(deposito)
+
+        solucao.append({
+            "rota": rota,
+            "servicos_atendidos": servicos_rota,
+            "demanda": carga,
+            "custo": custo,
+            "detalhes": detalhes_visitas,
         })
 
-    return rotas
+    return solucao
