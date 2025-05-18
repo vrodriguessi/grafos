@@ -46,3 +46,21 @@ class Grafo:
 
     def adicionar_no_obrigatorio(self, no):
         self.ReN.add(no)
+
+    def caminho_minimo(self, origem, destino):
+        if not hasattr(self, 'predecessores'):
+            self.distancias_minimas, self.predecessores = floyd_warshall(self)
+
+        caminho = []
+        u = origem - 1
+        v = destino - 1
+
+        if self.predecessores[u][v] is None:
+            return []  # Sem caminho
+
+        while v != u:
+            caminho.insert(0, v + 1)
+            v = self.predecessores[u][v] - 1
+        caminho.insert(0, origem)
+
+        return caminho
