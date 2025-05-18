@@ -1,7 +1,6 @@
 from src.utils.leitura_dados import parse_file_into_grafo, parse_capacidade
 from src.algorithms.estatisticas import calcular_estatisticas, calcular_caminho_medio, calcular_diametro, calcular_intermediacao
 from src.algorithms.floyd_warshall import obter_matriz_distancias, obter_matriz_predecessores
-from src.algorithms.path_scanning import path_scanning
 from src.utils.visualizacao import desenhar_grafo
 from src.utils.visualizacao_matrizes import imprimir_matrizes
 import argparse
@@ -47,7 +46,7 @@ def main():
     parser.add_argument("nome_arquivo", help="Nome do arquivo .dat (ex: grafo01.dat)")
 
     args = parser.parse_args()
-    pasta_arquivos = "C:/Projetos/Grafos/data/selected_instances/"
+    pasta_arquivos = "C:/Projetos/Grafos/Etapa 1/data/selected_instances/"
     caminho_arquivo = os.path.join(pasta_arquivos, args.nome_arquivo)
 
     if os.path.isfile(caminho_arquivo):

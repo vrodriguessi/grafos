@@ -1,9 +1,6 @@
 from src.utils.leitura_dados import parse_file_into_grafo, parse_capacidade
-from src.algorithms.estatisticas import calcular_estatisticas, calcular_caminho_medio, calcular_diametro, calcular_intermediacao
 from src.algorithms.floyd_warshall import obter_matriz_distancias, obter_matriz_predecessores
 from src.algorithms.path_scanning import path_scanning
-from src.utils.visualizacao import desenhar_grafo
-from src.utils.visualizacao_matrizes import imprimir_matrizes
 import argparse
 import os
 import sys
@@ -20,27 +17,8 @@ def processar_arquivo(arquivo):
 
     print(f"✅ Grafo de {arquivo} carregado com sucesso!")
 
-    estatisticas = calcular_estatisticas(grafo)
     dist = obter_matriz_distancias(grafo)
     pred = obter_matriz_predecessores(grafo)
-
-    caminho_medio = calcular_caminho_medio(dist)
-    diametro = calcular_diametro(dist)
-
-
-    print(f"\n📊 Estatísticas do Grafo {arquivo}:")
-    for chave, valor in estatisticas.items():
-        print(f"  {chave}: {valor}")
-    
-    print(f"  Caminho médio: {caminho_medio}")
-    print(f"  Diametro: {diametro}")
- 
-    imprimir_matrizes(dist, pred)
-
-    intermediacoes = calcular_intermediacao(dist, pred)
-    intermediacao_dict = {i: valor for i, valor in enumerate(intermediacoes, 1)}
-    print(f"  Intermediação: {intermediacao_dict}")
-    desenhar_grafo(grafo, titulo=f"Grafo - {os.path.basename(arquivo).replace('.dat', '')}")
 
     capacidade_veiculo = parse_capacidade(arquivo)
     rotas = path_scanning(grafo, capacidade_veiculo, deposito=1)
@@ -53,7 +31,7 @@ def main():
     parser.add_argument("nome_arquivo", help="Nome do arquivo .dat (ex: grafo01.dat)")
 
     args = parser.parse_args()
-    pasta_arquivos = "C:/Projetos/Grafos/data/selected_instances/"
+    pasta_arquivos = "C:/Projetos/Grafos/Etapa2/MCGRP/"
     caminho_arquivo = os.path.join(pasta_arquivos, args.nome_arquivo)
 
     if os.path.isfile(caminho_arquivo):
