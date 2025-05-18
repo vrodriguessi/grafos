@@ -9,6 +9,8 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 def processar_arquivo(arquivo):
     print(f"📂 Processando o arquivo {arquivo}...\n")
+
+    start_total = time.monotonic_ns()
     
     grafo = parse_file_into_grafo(arquivo)
 
@@ -17,19 +19,20 @@ def processar_arquivo(arquivo):
         return
 
     print(f"✅ Grafo de {arquivo} carregado com sucesso!")
-
-    capacidade_veiculo = parse_capacidade(arquivo)
     
-    start_clocks = time.process_time()
+    start_solucao = time.monotonic_ns()
     solucao = path_scanning(grafo, deposito=1)
-    end_clocks = time.process_time()
+    end_solucao = time.monotonic_ns()
 
-    tempo_execucao = end_clocks - start_clocks
-    tempo_encontrar_solucao = tempo_execucao 
+    end_total = time.monotonic_ns()
+
+    # tempos em nanosegundos (int)
+    tempo_execucao_total = end_total - start_total
+    tempo_solucao_clocks = end_solucao - start_solucao
 
     nome_arquivo_solucao = f"sol-{os.path.basename(arquivo).replace('.dat', '')}.dat"
 
-    salvar_resultado_path_scanning(solucao, tempo_execucao, tempo_encontrar_solucao, nome_arquivo_solucao)
+    salvar_resultado_path_scanning(solucao, tempo_execucao_total, tempo_solucao_clocks, nome_arquivo_solucao)
 
     print(f"✅ Resultado salvo no arquivo {nome_arquivo_solucao}")
 
