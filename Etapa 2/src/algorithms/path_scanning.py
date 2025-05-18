@@ -7,7 +7,13 @@ def path_scanning(grafo, deposito=1):
 
     servicos_pendentes = []
     id_global = 1
-    for u, v, custo, demanda in grafo.ReE:
+
+    for item in grafo.ReE:
+        u = item[0]
+        v = item[1]
+        custo = item[2] 
+        demanda = item[3]
+
         servicos_pendentes.append({
             "id": id_global,
             "tipo": "aresta",
@@ -18,7 +24,13 @@ def path_scanning(grafo, deposito=1):
             "atendido": False
         })
         id_global += 1
-    for u, v, custo, demanda in grafo.ReA:
+
+    for item in grafo.ReA:
+        u = item[0]
+        v = item[1]
+        custo = item[2]
+        demanda = item[3]
+
         servicos_pendentes.append({
             "id": id_global,
             "tipo": "arco",
@@ -41,7 +53,6 @@ def path_scanning(grafo, deposito=1):
 
         no_atual = deposito
 
-        # Adiciona visita ao depósito (início)
         detalhes_visitas.append({
             "servico": {
                 "tipo": "D",
@@ -65,7 +76,6 @@ def path_scanning(grafo, deposito=1):
             if not candidatos:
                 break  # Nenhum serviço viável, encerra a rota
 
-            # Escolhe o serviço mais próximo
             candidatos.sort(key=lambda s: dist[no_atual - 1][s["origem"] - 1])
             proximo = candidatos[0]
 
@@ -87,11 +97,9 @@ def path_scanning(grafo, deposito=1):
             proximo["atendido"] = True
             no_atual = proximo["destino"]
 
-            # Se a carga está no limite, termina a rota aqui
             if carga == capacidade_veiculo:
                 break
 
-        # Volta ao depósito
         custo_retorno = dist[no_atual - 1][deposito - 1]
         custo += custo_retorno
         rota.append(deposito)
