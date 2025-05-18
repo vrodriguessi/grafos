@@ -1,4 +1,4 @@
-from src.utils.leitura_dados import parse_file_into_grafo, parse_capacidade
+from src.utils.leitura_dados import parse_file_into_grafo
 from src.algorithms.path_scanning import path_scanning
 from src.utils.imprimir_resultados import salvar_resultado_path_scanning
 import argparse
