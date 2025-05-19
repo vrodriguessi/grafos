@@ -21,7 +21,7 @@ def processar_arquivo(arquivo):
     print(f"✅ Grafo de {arquivo} carregado com sucesso!")
     
     start_solucao = time.monotonic_ns()
-    solucao = path_scanning(grafo, deposito=1)
+    solucao = path_scanning(grafo)
     end_solucao = time.monotonic_ns()
 
     end_total = time.monotonic_ns()

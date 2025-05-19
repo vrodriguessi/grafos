@@ -1,140 +1,180 @@
-from copy import deepcopy
-from src.algorithms.floyd_warshall import floyd_warshall
+def construir_mapeamento_servico_id(grafo):
+    mapeamento = {}
+    contador = 1
 
-def path_scanning(grafo, deposito=1):
-    dist, _ = floyd_warshall(grafo)
-    capacidade_veiculo = grafo.capacidade
+    for no_info in grafo.nos_obrigatorios:
+        no = no_info['no']
+        chave = ("nó", no)
+        if chave not in mapeamento:
+            mapeamento[chave] = contador
+            contador += 1
 
-    servicos_pendentes = []
-    id_global = 1
+    for u, v, _, _ in grafo.arestas_obrigatorias:
+        chave = ("aresta", tuple(sorted((u, v))))
+        if chave not in mapeamento:
+            mapeamento[chave] = contador
+            contador += 1
 
-    # Arestas obrigatórias
-    for item in grafo.arestas_obrigatorias:
-        u = item[0]
-        v = item[1]
-        custo = item[2]
-        demanda = item[3]
+    for u, v, _, _ in grafo.arcos_obrigatorios:
+        chave = ("arco", (u, v))
+        if chave not in mapeamento:
+            mapeamento[chave] = contador
+            contador += 1
 
-        servicos_pendentes.append({
-            "id": id_global,
-            "tipo": "aresta",
-            "origem": u,
-            "destino": v,
-            "custo": custo,
+    return mapeamento
+
+
+def path_scanning(grafo):
+    grafo.calcular_floyd_warshall()
+
+    servicos_pendentes = set()
+    servico_info = {}
+
+    for u, v, custo, demanda in grafo.arestas_obrigatorias:
+        chave = ("aresta", tuple(sorted((u, v))))
+        servicos_pendentes.add(chave)
+        servico_info[chave] = {
             "demanda": demanda,
-            "atendido": False
-        })
-        id_global += 1
-
-    # Arcos obrigatórios
-    for item in grafo.arcos_obrigatorios:
-        u = item[0]
-        v = item[1]
-        custo = item[2]
-        demanda = item[3]
-
-        servicos_pendentes.append({
-            "id": id_global,
-            "tipo": "arco",
-            "origem": u,
-            "destino": v,
             "custo": custo,
+            "extremos": tuple(sorted((u, v))),
+        }
+
+    for u, v, custo, demanda in grafo.arcos_obrigatorios:
+        chave = ("arco", (u, v))
+        servicos_pendentes.add(chave)
+        servico_info[chave] = {
             "demanda": demanda,
-            "atendido": False
-        })
-        id_global += 1
+            "custo": custo,
+            "extremos": (u, v),
+        }
 
-    # Nós obrigatórios (ReN)
-    for no in grafo.nos_obrigatorios:
-        servicos_pendentes.append({
-            "id": id_global,
-            "tipo": "no",
-            "origem": no["no"],
-            "destino": no["no"],  # nó: origem e destino são iguais
-            "custo": no["custo"],
-            "demanda": no["demanda"],
-            "atendido": False
-        })
-        id_global += 1
+    for no_info in grafo.nos_obrigatorios:
+        no = no_info['no']
+        chave = ("nó", no)
+        servicos_pendentes.add(chave)
+        servico_info[chave] = {
+            "demanda": no_info.get("demanda", 1),
+            "custo": no_info.get("custo", 0),
+            "extremos": (no, no),
+        }
 
+    mapeamento_id = construir_mapeamento_servico_id(grafo)
     solucao = []
+    deposito = 1  # Ajuste conforme seu problema
 
-    while any(not s["atendido"] for s in servicos_pendentes):
+    while servicos_pendentes:
         rota = [deposito]
         carga = 0
         custo = 0
         servicos_rota = []
         detalhes_visitas = []
-
         no_atual = deposito
 
-        detalhes_visitas.append({
-            "servico": {
-                "tipo": "D",
-                "origem": deposito,
-                "destino": deposito,
-                "custo": 0,
-                "demanda": 0
-            },
-            "custo_ate_servico": 0,
-            "custo_servico": 0,
-            "carga_atual": carga
-        })
-
         while True:
-            candidatos = [
-                s for s in servicos_pendentes
-                if not s["atendido"] and s["demanda"] + carga <= capacidade_veiculo
-            ]
+            melhor_servico = None
+            melhor_caminho = None
+            menor_custo = float('inf')
+            melhor_extremos = None
 
-            if not candidatos:
+            for serv in servicos_pendentes:
+                info = servico_info[serv]
+                extremos = info["extremos"]
+
+                if serv[0] == "nó":
+                    caminho = grafo.obterCaminhoMinimo(no_atual, extremos[0])
+                    dist = grafo.obterDistanciaMinima(no_atual, extremos[0])
+                    chegada = extremos[0]
+                    outro_extremo = extremos[0]
+                else:
+                    caminho1 = grafo.obterCaminhoMinimo(no_atual, extremos[0])
+                    dist1 = grafo.obterDistanciaMinima(no_atual, extremos[0])
+                    caminho2 = grafo.obterCaminhoMinimo(no_atual, extremos[1])
+                    dist2 = grafo.obterDistanciaMinima(no_atual, extremos[1])
+
+                    if dist1 <= dist2:
+                        caminho = caminho1
+                        dist = dist1
+                        chegada = extremos[0]
+                        outro_extremo = extremos[1]
+                    else:
+                        caminho = caminho2
+                        dist = dist2
+                        chegada = extremos[1]
+                        outro_extremo = extremos[0]
+
+                demanda = info["demanda"]
+                if carga + demanda > grafo.capacidade:
+                    continue
+
+                if dist < menor_custo:
+                    melhor_servico = serv
+                    melhor_caminho = caminho
+                    melhor_extremos = extremos
+                    menor_custo = dist
+
+            if melhor_servico is None:
                 break
 
-            candidatos.sort(key=lambda s: dist[no_atual - 1][s["origem"] - 1])
-            proximo = candidatos[0]
+            # Atualizar rota e custo com o caminho até o serviço
+            if melhor_caminho and len(melhor_caminho) > 1:
+                for i in range(1, len(melhor_caminho)):
+                    custo += grafo.obterDistanciaMinima(melhor_caminho[i - 1], melhor_caminho[i])
+                    rota.append(melhor_caminho[i])
 
-            custo_ate_servico = dist[no_atual - 1][proximo["origem"] - 1]
-            custo_servico = proximo["custo"]
-            custo += custo_ate_servico + custo_servico
+            # Atualizar carga e custo com o serviço
+            info = servico_info[melhor_servico]
+            demanda = info["demanda"]
+            custo += info["custo"]
+            carga += demanda
+            servicos_rota.append(melhor_servico)
 
-            # Evita adicionar duas vezes o mesmo nó (origem == destino) no caminho
-            if proximo["origem"] == proximo["destino"]:
-                rota.append(proximo["origem"])
+            # Registrar detalhes da visita para o formato esperado
+            id_servico = mapeamento_id[melhor_servico]
+            if melhor_servico[0] == "nó":
+                visita = {
+                    "servico": {
+                        "tipo": "nó",
+                        "id": id_servico,
+                        "origem": melhor_extremos[0],
+                        "destino": melhor_extremos[0],
+                    }
+                }
             else:
-                rota.append(proximo["origem"])
-                rota.append(proximo["destino"])
+                u, v = melhor_extremos
+                if melhor_servico[0] == "arco":
+                    origem, destino = u, v
+                else:
+                    origem, destino = min(u, v), max(u, v)  # garante ordem para aresta não direcionada
 
-            carga += proximo["demanda"]
-            servicos_rota.append(proximo)
-            detalhes_visitas.append({
-                "servico": deepcopy(proximo),
-                "custo_ate_servico": custo_ate_servico,
-                "custo_servico": custo_servico,
-                "carga_atual": carga
-            })
+                visita = {
+                    "servico": {
+                        "tipo": melhor_servico[0],
+                        "id": id_servico,
+                        "origem": origem,
+                        "destino": destino,
+                    }
+                }
 
-            proximo["atendido"] = True
-            no_atual = proximo["destino"]
+            detalhes_visitas.append(visita)
+            servicos_pendentes.remove(melhor_servico)
+            no_atual = rota[-1]
 
-            if carga == capacidade_veiculo:
-                break
+        # Voltar ao depósito
+        if no_atual != deposito:
+            caminho_volta = grafo.obterCaminhoMinimo(no_atual, deposito)
+            if caminho_volta:
+                for i in range(1, len(caminho_volta)):
+                    custo += grafo.obterDistanciaMinima(caminho_volta[i - 1], caminho_volta[i])
+                    rota.append(caminho_volta[i])
+            no_atual = deposito  # Atualiza o nó atual para depósito
 
-        custo_retorno = dist[no_atual - 1][deposito - 1]
-        custo += custo_retorno
-        rota.append(deposito)
+        # Adicionar visita depósito (D) no início e no final da rota
+        detalhes_visitas.insert(0, {"servico": {"tipo": "D"}})   # início da rota
+        detalhes_visitas.append({"servico": {"tipo": "D"}})      # fim da rota
 
-        detalhes_visitas.append({
-            "servico": {
-                "tipo": "D",
-                "origem": deposito,
-                "destino": deposito,
-                "custo": 0,
-                "demanda": 0
-            },
-            "custo_ate_servico": custo_retorno,
-            "custo_servico": 0,
-            "carga_atual": carga
-        })
+
+        # Adicionar visita depósito (D) com id=0 para manter padrão
+        detalhes_visitas.insert(0, {"servico": {"tipo": "D", "id": 0}})
 
         solucao.append({
             "rota": rota,
