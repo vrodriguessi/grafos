@@ -8,10 +8,11 @@ def path_scanning(grafo, deposito=1):
     servicos_pendentes = []
     id_global = 1
 
-    for item in grafo.ReE:
+    # Arestas obrigatórias
+    for item in grafo.arestas_obrigatorias:
         u = item[0]
         v = item[1]
-        custo = item[2] 
+        custo = item[2]
         demanda = item[3]
 
         servicos_pendentes.append({
@@ -25,7 +26,8 @@ def path_scanning(grafo, deposito=1):
         })
         id_global += 1
 
-    for item in grafo.ReA:
+    # Arcos obrigatórios
+    for item in grafo.arcos_obrigatorios:
         u = item[0]
         v = item[1]
         custo = item[2]
@@ -38,6 +40,19 @@ def path_scanning(grafo, deposito=1):
             "destino": v,
             "custo": custo,
             "demanda": demanda,
+            "atendido": False
+        })
+        id_global += 1
+
+    # Nós obrigatórios (ReN)
+    for no in grafo.nos_obrigatorios:
+        servicos_pendentes.append({
+            "id": id_global,
+            "tipo": "no",
+            "origem": no["no"],
+            "destino": no["no"],  # nó: origem e destino são iguais
+            "custo": no["custo"],
+            "demanda": no["demanda"],
             "atendido": False
         })
         id_global += 1
@@ -67,14 +82,13 @@ def path_scanning(grafo, deposito=1):
         })
 
         while True:
-            # Filtra serviços viáveis com base na capacidade restante
             candidatos = [
-                s for s in servicos_pendentes 
+                s for s in servicos_pendentes
                 if not s["atendido"] and s["demanda"] + carga <= capacidade_veiculo
             ]
 
             if not candidatos:
-                break  # Nenhum serviço viável, encerra a rota
+                break
 
             candidatos.sort(key=lambda s: dist[no_atual - 1][s["origem"] - 1])
             proximo = candidatos[0]
@@ -83,8 +97,13 @@ def path_scanning(grafo, deposito=1):
             custo_servico = proximo["custo"]
             custo += custo_ate_servico + custo_servico
 
-            rota.append(proximo["origem"])
-            rota.append(proximo["destino"])
+            # Evita adicionar duas vezes o mesmo nó (origem == destino) no caminho
+            if proximo["origem"] == proximo["destino"]:
+                rota.append(proximo["origem"])
+            else:
+                rota.append(proximo["origem"])
+                rota.append(proximo["destino"])
+
             carga += proximo["demanda"]
             servicos_rota.append(proximo)
             detalhes_visitas.append({

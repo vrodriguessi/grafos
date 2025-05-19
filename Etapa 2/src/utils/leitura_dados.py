@@ -115,9 +115,11 @@ def parse_ren(lines):
 
         if ren_section:
             parts = re.split(r'\s+', line)
-            if len(parts) >= 1 and re.fullmatch(r'N\d+', parts[0]):
+            if len(parts) >= 3 and re.fullmatch(r'N\d+', parts[0]) and parts[1].isdigit() and parts[2].isdigit():
                 node_number = int(parts[0][1:])
-                ren.append(node_number)
+                demand = int(parts[1])
+                cost = int(parts[2])
+                ren.append((node_number, demand, cost))
 
     return ren
 
@@ -129,7 +131,7 @@ def calcular_num_vertices(ReA, ARC, ReE, EDGE, ReN):
         vertices.add(u)
         vertices.add(v)
 
-    vertices.update(ReN)
+    vertices.update([no[0] for no in ReN]) 
 
     return max(vertices) if vertices else 0
 
@@ -179,8 +181,9 @@ def parse_file_into_grafo(file_path):
         for u, v, custo in EDGE:
             grafo.adicionar_aresta_nao_obrigatoria(u, v, custo, demanda=0)
 
-        for no in ReN:
-            grafo.adicionar_no_obrigatorio(no)
+        for no, demanda, custo in ReN:
+            grafo.adicionar_no_obrigatorio(no, demanda, custo)
+
         
         capacidade = parse_capacidade(file_path)
         grafo.capacidade = capacidade
