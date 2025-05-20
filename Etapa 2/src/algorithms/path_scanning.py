@@ -4,7 +4,7 @@ def construir_mapeamento_servico_id(grafo):
 
     for no_info in grafo.nos_obrigatorios:
         no = no_info['no']
-        chave = ("nó", no)
+        chave = ("no", no)
         if chave not in mapeamento:
             mapeamento[chave] = contador
             contador += 1
@@ -50,7 +50,7 @@ def path_scanning(grafo):
 
     for no_info in grafo.nos_obrigatorios:
         no = no_info['no']
-        chave = ("nó", no)
+        chave = ("no", no)
         servicos_pendentes.add(chave)
         servico_info[chave] = {
             "demanda": no_info.get("demanda", 1),
@@ -60,7 +60,7 @@ def path_scanning(grafo):
 
     mapeamento_id = construir_mapeamento_servico_id(grafo)
     solucao = []
-    deposito = 1  # Ajuste conforme seu problema
+    deposito = 1  # Ajuste conforme o problema
 
     while servicos_pendentes:
         rota = [deposito]
@@ -75,12 +75,13 @@ def path_scanning(grafo):
             melhor_caminho = None
             menor_custo = float('inf')
             melhor_extremos = None
+            outro_extremo = None
 
             for serv in servicos_pendentes:
                 info = servico_info[serv]
                 extremos = info["extremos"]
 
-                if serv[0] == "nó":
+                if serv[0] == "no":
                     caminho = grafo.obterCaminhoMinimo(no_atual, extremos[0])
                     dist = grafo.obterDistanciaMinima(no_atual, extremos[0])
                     chegada = extremos[0]
@@ -109,8 +110,8 @@ def path_scanning(grafo):
                 if dist < menor_custo:
                     melhor_servico = serv
                     melhor_caminho = caminho
-                    melhor_extremos = extremos
                     menor_custo = dist
+                    melhor_extremos = extremos
 
             if melhor_servico is None:
                 break
@@ -128,23 +129,30 @@ def path_scanning(grafo):
             carga += demanda
             servicos_rota.append(melhor_servico)
 
-            # Registrar detalhes da visita para o formato esperado
+            # Se for serviço do tipo "no", adiciona explicitamente à rota
+            if melhor_servico[0] == "no":
+                rota.append(info["extremos"][0])
+                no_atual = info["extremos"][0]
+            else:
+                no_atual = outro_extremo
+
+            # Registrar detalhes da visita
             id_servico = mapeamento_id[melhor_servico]
-            if melhor_servico[0] == "nó":
+            if melhor_servico[0] == "no":
                 visita = {
                     "servico": {
-                        "tipo": "nó",
+                        "tipo": "no",
                         "id": id_servico,
-                        "origem": melhor_extremos[0],
-                        "destino": melhor_extremos[0],
+                        "origem": info["extremos"][0],
+                        "destino": info["extremos"][0],
                     }
                 }
             else:
-                u, v = melhor_extremos
+                u, v = info["extremos"]
                 if melhor_servico[0] == "arco":
                     origem, destino = u, v
                 else:
-                    origem, destino = min(u, v), max(u, v)  # garante ordem para aresta não direcionada
+                    origem, destino = min(u, v), max(u, v)
 
                 visita = {
                     "servico": {
@@ -157,7 +165,6 @@ def path_scanning(grafo):
 
             detalhes_visitas.append(visita)
             servicos_pendentes.remove(melhor_servico)
-            no_atual = rota[-1]
 
         # Voltar ao depósito
         if no_atual != deposito:
@@ -166,15 +173,11 @@ def path_scanning(grafo):
                 for i in range(1, len(caminho_volta)):
                     custo += grafo.obterDistanciaMinima(caminho_volta[i - 1], caminho_volta[i])
                     rota.append(caminho_volta[i])
-            no_atual = deposito  # Atualiza o nó atual para depósito
+            no_atual = deposito
 
-        # Adicionar visita depósito (D) no início e no final da rota
-        detalhes_visitas.insert(0, {"servico": {"tipo": "D"}})   # início da rota
-        detalhes_visitas.append({"servico": {"tipo": "D"}})      # fim da rota
-
-
-        # Adicionar visita depósito (D) com id=0 para manter padrão
-        detalhes_visitas.insert(0, {"servico": {"tipo": "D", "id": 0}})
+        # Adicionar visita ao depósito (D) no início e fim
+        detalhes_visitas.insert(0, {"servico": {"tipo": "D"}})
+        detalhes_visitas.append({"servico": {"tipo": "D"}})
 
         solucao.append({
             "rota": rota,

@@ -21,7 +21,7 @@ def salvar_resultado_path_scanning(solucao, tempo_total, tempo_encontrar_solucao
 
                 if tipo == "D":
                     f.write(f" (D 0,1,1)")
-                elif tipo in ("aresta", "arco"):
+                elif tipo in ("aresta", "arco", "no"):
                     id_servico = servico["id"]
                     origem = servico["origem"]
                     destino = servico["destino"]

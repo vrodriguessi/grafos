@@ -41,7 +41,7 @@ def main():
     parser.add_argument("nome_arquivo", help="Nome do arquivo .dat (ex: grafo01.dat)")
 
     args = parser.parse_args()
-    pasta_arquivos = "C:/Projetos/Grafos/Etapa 2/MCGRP/"
+    pasta_arquivos = "MCGRP/"
     caminho_arquivo = os.path.join(pasta_arquivos, args.nome_arquivo)
 
     if os.path.isfile(caminho_arquivo):
