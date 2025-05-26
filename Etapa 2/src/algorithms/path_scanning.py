@@ -72,7 +72,7 @@ def path_scanning(grafo):
         rota = [deposito]
         carga = 0
         custo = 0
-        servicos_rota = []
+        servicosRota = []
         resgistroVisitas = [{"servico": {"tipo": "D"}}] 
         noAtual = deposito
 
@@ -123,7 +123,7 @@ def path_scanning(grafo):
             info = dadosTarefas[melhorOpcao]
             custo += info["custo"]
             carga += info["demanda"]
-            servicos_rota.append(melhorOpcao)
+            servicosRota.append(melhorOpcao)
             noAtual = melhorExtremo
 
             id_servico = idsServicos[melhorOpcao]
@@ -149,7 +149,7 @@ def path_scanning(grafo):
         
         solucao.append({
             "rota": rota,
-            "servicos_atendidos": servicos_rota,
+            "servicos_atendidos": servicosRota,
             "demanda": carga,
             "custo": custo,
             "detalhes": resgistroVisitas,
