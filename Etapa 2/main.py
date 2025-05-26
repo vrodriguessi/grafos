@@ -26,11 +26,9 @@ def processar_arquivo(arquivo, pasta_saida="Solucoes"):
 
     end_total = time.monotonic_ns()
 
-    # tempos em nanosegundos (int)
     tempo_execucao_total = end_total - start_total
     tempo_solucao_clocks = end_solucao - start_solucao
 
-    # Define o caminho completo do arquivo de saída (ex: Solucoes/sol-BHW1.dat)
     nome_arquivo_solucao = f"sol-{os.path.basename(arquivo).replace('.dat', '')}.dat"
     caminho_saida = os.path.join(pasta_saida, nome_arquivo_solucao)
 
@@ -45,17 +43,14 @@ def main():
     pasta_entrada = "MCGRP/"
     pasta_saida = "Solucoes/"
 
-    # Criar a pasta de saída se não existir
     if not os.path.exists(pasta_saida):
         os.makedirs(pasta_saida)
 
-    # Processar todos os arquivos .dat na pasta de entrada
     for nome_arquivo in os.listdir(pasta_entrada):
         if nome_arquivo.endswith(".dat"):
             caminho_entrada = os.path.join(pasta_entrada, nome_arquivo)
             print(f"\n✅ Processando: {nome_arquivo}")
 
-            # Processa o arquivo (a função já salva o resultado internamente)
             processar_arquivo(caminho_entrada)
 
 if __name__ == "__main__":
