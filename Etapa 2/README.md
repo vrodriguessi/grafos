@@ -25,95 +25,108 @@
 
 ## 📌 Sobre o Projeto
 
-### Etapa 1 - Pré-processamento dos dados
+### Etapa 2 - Solução Inicial
 
-Este projeto tem como objetivo a manipulação e análise de **grafos aplicados a problemas de logística**, focando especialmente no pré-processamento dos dados.
+Nesta segunda etapa do projeto, foi desenvolvido um **algoritmo construtivo** para gerar uma **solução inicial** viável para o problema de roteamento com restrições apresentado na Etapa 1.
 
-Na **Etapa 1**, o sistema realiza a leitura de instâncias no formato `.dat`, constrói a estrutura do grafo e extrai métricas e estatísticas relevantes que podem auxiliar na resolução de desafios logísticos, como o planejamento de rotas e a análise de conexões.
-
-Além disso, o projeto conta com uma visualização gráfica interativa por meio de **Jupyter Notebooks**, permitindo que os usuários explorem visualmente a estrutura da rede. Isso facilita a análise das rotas de forma mais intuitiva e dinâmica, promovendo insights mais claros sobre os dados processados.
+Um algoritmo construtivo parte de uma solução vazia e, a partir de critérios definidos, constrói iterativamente uma solução completa e factível, respeitando as restrições operacionais do problema.
 
 ---
 
 
-## 🎯 Definição do Problema
+## 🎯 Objetivo
 
-O projeto busca solucionar problemas de logística utilizando conceitos de grafos. Imagine uma cidade onde diversas mercadorias precisam ser entregues em diferentes pontos. As ruas conectam esses locais, mas algumas vias têm restrições ou custos diferentes para o transporte. O objetivo é encontrar a melhor maneira de organizar essas entregas para minimizar o custo e garantir que todas as demandas sejam atendidas.
+O objetivo principal desta etapa é produzir soluções iniciais que:
 
-Neste contexto, um grafo é utilizado para representar as interseções e vias da região, onde cada ponto representa um local e cada conexão entre eles é uma rua ou avenida. Algumas dessas vias têm demandas específicas, ou seja, devem obrigatoriamente ser percorridas para realizar as entregas. O desafio é planejar rotas eficientes considerando restrições como custos, direção das vias e capacidade dos veículos.
+✅ Atendam todas as demandas obrigatórias do grafo;
 
-Este projeto se propõe a modelar e resolver esse tipo de problema, aplicando algoritmos que auxiliam na identificação das melhores soluções para diferentes cenários de transporte e distribuição.
+✅ Não ultrapassem a capacidade dos veículos em cada rota;
+
+✅ Atribuam cada serviço a exatamente uma rota;
+
+✅ Não dupliquem o custo ou demanda de um serviço, mesmo que ele seja percorrido mais de uma vez.
 
 ---
 
-## 🔧 Funcionalidades Implementadas
+## 🔧 Funcionalidades Implementadas - Algoritmo Construtivo baseado na heurística **Path Scanning**
 
-- ✔ Leitura e interpretação de arquivos `.dat`
-- ✔ Construção e visualização de grafos
-- ✔ Cálculo de estatísticas do grafo
-- ✔ Visualização com Jupyter Notebook
+O algoritmo implementado na Etapa 2 segue os seguintes princípios:
+
+📥 Inicia com uma solução vazia;
+
+🔄 Iterativamente seleciona os serviços a serem atendidos;
+
+🧩 Agrupa os serviços em rotas respeitando a capacidade dos veículos;
+
+🔁 Se um arco, aresta ou vértice for visitado mais de uma vez, a demanda e custo associados ao serviço são contabilizados apenas uma vez;
+
+✅ Ao final, é garantido que todas as restrições do problema estão sendo respeitadas.
 
 ---
 
 ## 🚀 Como Usar?
 
-### 📥 Instalação
-
-Clone o repositório e acesse a pasta do projeto:
+### ▶️ Execução
+Para rodar o algoritmo e gerar uma solução:
 
 ```bash
-git clone https://github.com/vrodriguessi/grafos.git
-cd grafos
+python main.py nome_instancia.dat`
 ```
----
-## ▶️ Execução
+### 💾 Saída
+As soluções geradas são salvas no diretório **Solucoes** no formato padrão especificado pelo professor, com o seguinte formato de nome:
 
-Para executar a aplicação principal:
 ```bash
-python main.py
+sol-nomeinstancia.dat
 ```
----
-## 📂 Estrutura do Projeto
+
+### ✅ Informações presentes no arquivo de solução:
+- Custo total da solução
+
+- Número total de rotas
+
+- Total de clocks para a execução do algoritmo de referência
+
+- Total de clocks para encontrar a melhor solução encontrada (referência)
+
+### 🔧 Estrutura de cada rota:
+
 ```bash
-📁 root/
-├── 📁 data/
-│   └── 📁 selected_instances/            # Instâncias em formato `.dat` com os dados de entrada
-│       ├── 📄 BHW1.dat
-│       ├── 📄 BHW2.dat
-│       ├── 📄 BHW3.dat
-│       ├── 📄 BHW4.dat
-│       ├── 📄 BHW5.dat
-│       ├── 📄 BHW6.dat
-│       ├── 📄 BHW7.dat
-│       ├── 📄 BHW8.dat
-│       ├── 📄 BHW9.dat
-│       └── 📄 BHW10.dat
-│
-├── 📁 src/
-│   ├── 📁 algorithms/                    # Implementações dos algoritmos de grafos
-│   │   ├── 📄 __init__.py
-│   │   ├── 📄 estatisticas.py            # Estatísticas como grau, densidade, etc.
-│   │   └── 📄 floyd_warshall.py          # Algoritmo de caminhos mínimos
-│   │
-│   ├── 📁 models/                        # (Reservado para estruturas futuras)
-│   │   └── 📄 __init__.py
-│   │
-│   └── 📁 utils/                         # Funções auxiliares
-│       ├── 📄 __init__.py
-│       ├── 📄 leitura_dados.py           # Parser de arquivos `.dat`
-│       └── 📄 visualizacao.py            # Visualização gráfica dos grafos
-│
-├── 📄 Grafos.py                          # Classe `Grafo` com representação e métodos
-├── 📄 main.py                            # Script principal para execução dos testes
-├── 📄 processamento_grafos_com_visualizacao.ipynb  # Notebook com visualizações interativas
-└── 📄 README.md                          # Documentação do projeto
-
+índice_do_depósito dia_da_roteirização identificador_da_rota demanda_total_da_rota custo_total_da_rota total_de_visitas (X i,j,k) ...
 ```
----
-## 💬 Considerações Finais
-Este projeto representa o nosso esforço em aplicar, na prática, os conceitos aprendidos ao longo da disciplina de Grafos. Exploramos algoritmos clássicos e estruturas fundamentais para solucionar um problema real de logística, unindo teoria e prática em um trabalho significativo.
+- índice_do_depósito: sempre 0
 
-Acreditamos que este tipo de aplicação contribui não apenas para a compreensão dos grafos, mas também para a construção de soluções inteligentes e eficientes no mundo real.
+- dia_da_roteirização: sempre 1
 
+- identificador_da_rota: inicia em 1 e incrementa para cada rota
 
+- demanda_total_da_rota: soma das demandas dos serviços na rota
+
+- custo_total_da_rota: soma dos custos dos deslocamentos e atendimentos
+
+- total_de_visitas: quantidade total de visitas realizadas (incluindo o depósito)
+
+### 🔧 Formato das visitas:
+- As visitas são representadas por triplas do tipo (X i,j,k), com o seguinte significado:
+```bash
+(D 0,1,1): visita ao depósito
+(S id_serviço,extremidade1,extremidade2): visita a um serviço requerido
+```
+### Exemplos:
+- 📌 Serviço 2 do arquivo BHW1.dat corresponde ao nó requerido:
+
+```bash
+N3 1 1
+Representado na rota como: (S 2,3,3)
+```
+- 📌 Serviço 14 do arquivo BHW1.dat corresponde à aresta requerida:
+```bash  
+E7 7 8 8 1 9
+Se percorrida de 7 para 8: (S 14,7,8)
+```
+- 📌 Serviço 26 do arquivo BHW1.dat corresponde ao arco requerido:
+```bash  
+A8 7 6 4 1 5
+Se percorrido de 7 para 6: (S 26,7,6)
+```
+⚠️ Importante: Apenas visitas a serviços são registradas no detalhamento da rota — deslocamentos intermediários entre serviços ou retorno ao depósito não são listados como (S ...).
 
