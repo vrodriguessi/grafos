@@ -49,6 +49,26 @@ Na **Etapa 2** do projeto, foi desenvolvido um algoritmo construtivo com base na
 O algoritmo constrói rotas partindo de uma solução vazia e adicionando serviços de forma iterativa, garantindo que cada serviço seja atendido por apenas uma rota e que nenhuma rota exceda a capacidade dos veículos. Caso um serviço seja visitado mais de uma vez, sua demanda e custo são contabilizados apenas uma vez. 
 As soluções geradas seguem um formato padronizado, incluindo informações detalhadas como custo total, número de rotas, tempo de execução e a sequência de visitas em cada rota.
 
+### Etapa 3 - Otimização das Rotas
+
+Na **Etapa 3**, foi implementada uma etapa de **otimização** sobre as rotas geradas pelo algoritmo construtivo **Path Scanning**, utilizando a heurística de melhoria local **2-opt**.
+
+O objetivo desta etapa é **reduzir o custo total das rotas**, reorganizando a sequência dos serviços dentro de cada rota sem violar as restrições do problema, como a capacidade dos veículos e a obrigatoriedade dos atendimentos.
+
+### 🔧 Funcionamento da Otimização
+
+- Após a construção das rotas, cada uma é analisada individualmente;
+- O algoritmo **2-opt** verifica pares de visitas na rota e avalia se a troca da ordem desses serviços pode resultar em um trajeto mais curto (menor custo);
+- Se houver melhoria, a troca é realizada e o processo continua até que nenhuma melhoria adicional seja possível;
+- Essa otimização não altera a quantidade de rotas nem a alocação dos serviços entre as rotas — apenas melhora a ordem dos atendimentos dentro de cada uma.
+
+### ✔ Benefícios da Etapa 3
+
+- 🔻 Redução do custo total das soluções;
+- 🧠 Melhoria significativa na qualidade das rotas com um baixo custo computacional;
+- ✅ Todas as restrições operacionais continuam sendo atendidas;
+- 💼 Soluções mais próximas de resultados ótimos, especialmente em instâncias de maior porte.
+
 ---
 
 ## 🔧 Funcionalidades Implementadas
@@ -59,6 +79,11 @@ As soluções geradas seguem um formato padronizado, incluindo informações det
 - ✔ Visualização com Jupyter Notebook
 - ✔ Algoritmo baseado na heurística `Path Scanning` para geração de soluções iniciais
 - ✔ Geração de arquivos de solução formatados conforme padrão da disciplina
+- ✔ Implementação do algoritmo de melhoria local **2-opt**;
+- ✔ Aplicação do 2-opt de forma individual em cada rota;
+- ✔ Geração de soluções otimizadas com custos menores;
+- ✔ Validação de que as soluções otimizadas continuam factíveis;
+- ✔ Atualização dos arquivos de solução com os novos custos reduzidos.
 
 ---
 
@@ -103,7 +128,8 @@ python main.py
 │
 ├── 📁 Etapa 2/
 │   ├── 📁 MCGRP/                          # Instâncias e arquivos de entrada
-│   ├── 📁 Solucoes/                       # Soluções geradas 
+│   ├── 📁 Solucoes/                       # Soluções geradas pelo usuário
+│   ├── 📁 SolucoesProntas/                # Soluções geradas por nós previamente
 │   ├── 📁 src/
 │   │   ├── 📁 algorithms/                 
 │   │   │   ├── 📄 floyd_warshall.py       # Reutilização do algoritmo de caminhos mínimos
@@ -113,8 +139,24 @@ python main.py
 │   │   │   ├── 📄 leitura_dados.py        # Leitura das instâncias de teste da Etapa 2
 │   │   │   ├── 📄 imprimir_resultados.py  # Impressão da solução no formato exigido
 │   │   └── 📄 Grafos.py                   # Estruturas e utilidades de grafo
-│   ├── 📄 main.py                         # Execução da Etapa 1
+│   ├── 📄 main.py                         # Execução da Etapa 2
 │   └── 📄 README.md                       # Descrição da Etapa 2
+│
+├── 📁 Etapa 3/
+│   ├── 📁 MCGRP/                          # Instâncias e arquivos de entrada
+│   ├── 📁 Solucoes/                       # Soluções geradas pelo usuário
+│   ├── 📁 SolucoesProntas/                # Soluções geradas por nós previamente
+│   ├── 📁 src/
+│   │   ├── 📁 algorithms/                 
+│   │   │   ├── 📄 floyd_warshall.py       # Reutilização do algoritmo de caminhos mínimos
+│   │   │   └── 📄 path_scanning.py        # Algoritmo construtivo (Path Scanning) + Algoritmo de busca local 2-Opt (otimização de custos)
+│   │   ├── 📁 models/                     
+│   │   ├── 📁 utils/
+│   │   │   ├── 📄 leitura_dados.py        # Leitura das instâncias de teste da Etapa 3
+│   │   │   ├── 📄 imprimir_resultados.py  # Impressão da solução no formato exigido
+│   │   └── 📄 Grafos.py                   # Estruturas e utilidades de grafo
+│   ├── 📄 main.py                         # Execução da Etapa 3
+│   └── 📄 README.md                       # Descrição da Etapa 3
 │
 └── 📄 README.md                           # README geral do projeto
 
