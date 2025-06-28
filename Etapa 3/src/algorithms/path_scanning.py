@@ -37,13 +37,13 @@ def calcular_custo_rota(rota, grafo):
 
 def path_scanning(grafo):
     grafo.calcular_floyd_warshall()
-    
+
     tarefas = set()
     dadosTarefas = {}
     idsServicos = {}
 
     contadorId = 1
-    
+
     for InfoNo in grafo.nos_obrigatorios:
         no = InfoNo['no']
         chave = ("no", no)
@@ -79,7 +79,7 @@ def path_scanning(grafo):
         contadorId += 1
 
     solucao = []
-    deposito = grafo.depot_node or 1
+    deposito = grafo.depotNode or 1  # <-- Usa o nó do depósito (fallback = 1)
     capacidadeMax = grafo.capacidade
 
     while tarefas:
@@ -87,7 +87,7 @@ def path_scanning(grafo):
         carga = 0
         custo = 0
         servicosRota = []
-        registroVisitas = [{"servico": {"tipo": "D"}}] 
+        resgistroVisitas = [{"servico": {"tipo": "D"}}]
         noAtual = deposito
 
         while True:
@@ -102,7 +102,7 @@ def path_scanning(grafo):
                     continue
 
                 extremos = info["extremos"]
-                
+
                 if serv[0] == "no":
                     dist = grafo.obterDistanciaMinima(noAtual, extremos[0])
                     chegada = extremos[0]
@@ -110,7 +110,7 @@ def path_scanning(grafo):
                 else:
                     dist1 = grafo.obterDistanciaMinima(noAtual, extremos[0])
                     dist2 = grafo.obterDistanciaMinima(noAtual, extremos[1])
-                    
+
                     if dist1 <= dist2:
                         dist = dist1
                         chegada = extremos[0]
@@ -132,7 +132,7 @@ def path_scanning(grafo):
             caminho = grafo.obterCaminhoMinimo(noAtual, melhorDestino)
             if caminho and len(caminho) > 1:
                 custo += menorCusto
-                rota.extend(caminho[1:]) 
+                rota.extend(caminho[1:])
 
             info = dadosTarefas[melhorOpcao]
             custo += info["custo"]
@@ -149,7 +149,7 @@ def path_scanning(grafo):
                     "destino": info["extremos"][1] if melhorOpcao[0] != "no" else info["extremos"][0],
                 }
             }
-            registroVisitas.append(visita)
+            resgistroVisitas.append(visita)
             tarefas.remove(melhorOpcao)
 
         if noAtual != deposito:
@@ -159,17 +159,14 @@ def path_scanning(grafo):
                 custo += dist_volta
                 rota.extend(caminhoVolta[1:])
 
-        registroVisitas.append({"servico": {"tipo": "D"}})
-
-        rota_otimizada = aplicar_2opt(rota, grafo, servicosRota, dadosTarefas)
-        custo_otimizado = calcular_custo_rota(servicosRota, dadosTarefas)
+        resgistroVisitas.append({"servico": {"tipo": "D"}})
 
         solucao.append({
-            "rota": rota_otimizada,
+            "rota": rota,
             "servicos_atendidos": servicosRota,
             "demanda": carga,
-            "custo": custo_otimizado,
-            "detalhes": registroVisitas,
+            "custo": custo,
+            "detalhes": resgistroVisitas,
         })
 
     return solucao
