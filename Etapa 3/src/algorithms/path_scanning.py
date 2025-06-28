@@ -1,4 +1,7 @@
-def aplicar_2opt(rota, grafo, servicos_atendidos=None, dadosTarefas=None):
+def aplicar_2opt(rota, grafo):
+    depot = rota[0]
+    assert rota[-1] == depot, "A rota deve terminar no depósito"
+
     melhor_rota = rota.copy()
     melhoria = True
 
@@ -6,33 +9,31 @@ def aplicar_2opt(rota, grafo, servicos_atendidos=None, dadosTarefas=None):
         melhoria = False
         for i in range(1, len(melhor_rota) - 2):
             for j in range(i + 1, len(melhor_rota) - 1):
-                if j - i == 1:  
+                if j - i == 1:
                     continue
 
                 nova_rota = melhor_rota[:i] + melhor_rota[i:j][::-1] + melhor_rota[j:]
 
-                custo_atual = calcular_custo_rota(melhor_rota, grafo, servicos_atendidos, dadosTarefas)
-                custo_novo = calcular_custo_rota(nova_rota, grafo, servicos_atendidos, dadosTarefas)
+                if nova_rota[0] != depot or nova_rota[-1] != depot:
+                    continue  # rota inválida
+
+                custo_atual = calcular_custo_rota(melhor_rota, grafo)
+                custo_novo = calcular_custo_rota(nova_rota, grafo)
 
                 if custo_novo < custo_atual:
                     melhor_rota = nova_rota
                     melhoria = True
-                    break  
+                    break
             if melhoria:
                 break
 
     return melhor_rota
 
-
-def calcular_custo_rota(servicos_atendidos=None, dadosTarefas=None):
+def calcular_custo_rota(rota, grafo):
     custo = 0
-       
-    if servicos_atendidos and dadosTarefas:
-        for servico in servicos_atendidos:
-            custo += dadosTarefas[servico]["custo"]
-    
+    for i in range(len(rota) - 1):
+        custo += grafo.obterDistanciaMinima(rota[i], rota[i + 1])
     return custo
-
 
 def path_scanning(grafo):
     grafo.calcular_floyd_warshall()
@@ -78,7 +79,7 @@ def path_scanning(grafo):
         contadorId += 1
 
     solucao = []
-    deposito = 1
+    deposito = grafo.depot_node or 1
     capacidadeMax = grafo.capacidade
 
     while tarefas:

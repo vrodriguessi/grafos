@@ -8,6 +8,7 @@ class Grafo:
         self.num_arestas_req = 0
         self.num_arcos_req = 0
         self.capacidade = 0
+        self.depotNode = None
 
         self.arestas_nao_obrigatorias = []  # Arestas não obrigatórias
         self.arestas_obrigatorias = []    # Arestas obrigatórias

@@ -1,6 +1,16 @@
 import re
 from src.Grafos import Grafo
 
+def parse_depot_node(lines):
+    for line in lines:
+        line = line.strip()
+        if line.startswith("Depot Node:"):
+            try:
+                return int(line.split(":")[1].strip())
+            except ValueError:
+                continue
+    return None
+
 def parse_arcos_obrigatorios(lines):
     arcos = []
     arc_section = False
@@ -159,14 +169,13 @@ def parse_file_into_grafo(file_path):
         with open(file_path, 'r', encoding='utf-8') as file:
             lines = file.readlines()
 
-        ReA = parse_arcos_obrigatorios(lines)     # ReA.
-        ARC = parse_arcos_nao_obrigatorios(lines) # ARC
-        ReE = parse_rees(lines)                   # ReE.
-        EDGE = parse_edges(lines)                 # EDGE
-        ReN = parse_ren(lines)                    # ReN.
+        ReA = parse_arcos_obrigatorios(lines)
+        ARC = parse_arcos_nao_obrigatorios(lines)
+        ReE = parse_rees(lines)
+        EDGE = parse_edges(lines)
+        ReN = parse_ren(lines)
 
         num_vertices = calcular_num_vertices(ReA, ARC, ReE, EDGE, ReN)
-
         grafo = Grafo(num_vertices)
 
         for u, v, custo, demanda in ReA:
@@ -182,11 +191,10 @@ def parse_file_into_grafo(file_path):
             grafo.adicionar_aresta_nao_obrigatoria(u, v, custo, demanda=0)
 
         for no, demanda, custo in ReN:
-            grafo.adicionar_no_obrigatorio(no, demanda, custo)
+            grafo.adicionar_no_obrigatorio(no)
 
-        
-        capacidade = parse_capacidade(file_path)
-        grafo.capacidade = capacidade
+        grafo.capacidade = parse_capacidade(file_path)
+        grafo.depot_node = parse_depot_node(lines)  # <--- DEPOT NODE AQUI
 
         return grafo
 
