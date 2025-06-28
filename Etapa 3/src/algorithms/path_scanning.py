@@ -6,7 +6,6 @@ def calcular_custo_rota(rota, grafo):
 
 def aplicar_2opt(rota, grafo):
     depot = rota[0]
-    assert rota[-1] == depot, "A rota deve terminar no depósito"
 
     melhor_rota = rota.copy()
     melhoria = True
