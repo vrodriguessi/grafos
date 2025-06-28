@@ -161,7 +161,6 @@ def path_scanning(grafo):
 
         resgistroVisitas.append({"servico": {"tipo": "D"}})
 
-        # Aplica 2-opt aqui
         rota_2opt = aplicar_2opt(rota, grafo)
         custo_2opt = calcular_custo_rota(rota_2opt, grafo)
 
@@ -170,7 +169,7 @@ def path_scanning(grafo):
             "servicos_atendidos": servicosRota,
             "demanda": carga,
             "custo": custo_2opt,
-            "detalhes": resgistroVisitas,  # cuidado: detalhes podem não estar coerentes após 2-opt
+            "detalhes": resgistroVisitas, 
         })
 
     return solucao
