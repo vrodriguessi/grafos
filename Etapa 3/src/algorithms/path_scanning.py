@@ -1,7 +1,4 @@
-def aplicar_2opt(rota, grafo):
-    depot = rota[0]
-    assert rota[-1] == depot, "A rota deve terminar no depósito"
-
+def aplicar_2opt(rota, grafo, servicos_atendidos=None, dadosTarefas=None):
     melhor_rota = rota.copy()
     melhoria = True
 
@@ -9,41 +6,43 @@ def aplicar_2opt(rota, grafo):
         melhoria = False
         for i in range(1, len(melhor_rota) - 2):
             for j in range(i + 1, len(melhor_rota) - 1):
-                if j - i == 1:
+                if j - i == 1:  
                     continue
 
                 nova_rota = melhor_rota[:i] + melhor_rota[i:j][::-1] + melhor_rota[j:]
 
-                if nova_rota[0] != depot or nova_rota[-1] != depot:
-                    continue  # rota inválida
-
-                custo_atual = calcular_custo_rota(melhor_rota, grafo)
-                custo_novo = calcular_custo_rota(nova_rota, grafo)
+                custo_atual = calcular_custo_rota(melhor_rota, grafo, servicos_atendidos, dadosTarefas)
+                custo_novo = calcular_custo_rota(nova_rota, grafo, servicos_atendidos, dadosTarefas)
 
                 if custo_novo < custo_atual:
                     melhor_rota = nova_rota
                     melhoria = True
-                    break
+                    break  
             if melhoria:
                 break
 
     return melhor_rota
 
-def calcular_custo_rota(rota, grafo):
+
+def calcular_custo_rota(servicos_atendidos=None, dadosTarefas=None):
     custo = 0
-    for i in range(len(rota) - 1):
-        custo += grafo.obterDistanciaMinima(rota[i], rota[i + 1])
+       
+    if servicos_atendidos and dadosTarefas:
+        for servico in servicos_atendidos:
+            custo += dadosTarefas[servico]["custo"]
+    
     return custo
+
 
 def path_scanning(grafo):
     grafo.calcular_floyd_warshall()
-
+    
     tarefas = set()
     dadosTarefas = {}
     idsServicos = {}
 
     contadorId = 1
-
+    
     for InfoNo in grafo.nos_obrigatorios:
         no = InfoNo['no']
         chave = ("no", no)
@@ -79,7 +78,7 @@ def path_scanning(grafo):
         contadorId += 1
 
     solucao = []
-    deposito = grafo.depotNode or 1  # <-- Usa o nó do depósito (fallback = 1)
+    deposito = 1
     capacidadeMax = grafo.capacidade
 
     while tarefas:
@@ -87,7 +86,7 @@ def path_scanning(grafo):
         carga = 0
         custo = 0
         servicosRota = []
-        resgistroVisitas = [{"servico": {"tipo": "D"}}]
+        registroVisitas = [{"servico": {"tipo": "D"}}] 
         noAtual = deposito
 
         while True:
@@ -102,7 +101,7 @@ def path_scanning(grafo):
                     continue
 
                 extremos = info["extremos"]
-
+                
                 if serv[0] == "no":
                     dist = grafo.obterDistanciaMinima(noAtual, extremos[0])
                     chegada = extremos[0]
@@ -110,7 +109,7 @@ def path_scanning(grafo):
                 else:
                     dist1 = grafo.obterDistanciaMinima(noAtual, extremos[0])
                     dist2 = grafo.obterDistanciaMinima(noAtual, extremos[1])
-
+                    
                     if dist1 <= dist2:
                         dist = dist1
                         chegada = extremos[0]
@@ -132,7 +131,7 @@ def path_scanning(grafo):
             caminho = grafo.obterCaminhoMinimo(noAtual, melhorDestino)
             if caminho and len(caminho) > 1:
                 custo += menorCusto
-                rota.extend(caminho[1:])
+                rota.extend(caminho[1:]) 
 
             info = dadosTarefas[melhorOpcao]
             custo += info["custo"]
@@ -149,7 +148,7 @@ def path_scanning(grafo):
                     "destino": info["extremos"][1] if melhorOpcao[0] != "no" else info["extremos"][0],
                 }
             }
-            resgistroVisitas.append(visita)
+            registroVisitas.append(visita)
             tarefas.remove(melhorOpcao)
 
         if noAtual != deposito:
@@ -159,14 +158,17 @@ def path_scanning(grafo):
                 custo += dist_volta
                 rota.extend(caminhoVolta[1:])
 
-        resgistroVisitas.append({"servico": {"tipo": "D"}})
+        registroVisitas.append({"servico": {"tipo": "D"}})
+
+        rota_otimizada = aplicar_2opt(rota, grafo, servicosRota, dadosTarefas)
+        custo_otimizado = calcular_custo_rota(servicosRota, dadosTarefas)
 
         solucao.append({
-            "rota": rota,
+            "rota": rota_otimizada,
             "servicos_atendidos": servicosRota,
             "demanda": carga,
-            "custo": custo,
-            "detalhes": resgistroVisitas,
+            "custo": custo_otimizado,
+            "detalhes": registroVisitas,
         })
 
     return solucao
