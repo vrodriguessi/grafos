@@ -25,52 +25,43 @@
 
 ## 📌 Sobre o Projeto
 
-### Etapa 2 - Solução Inicial
+## 🏁 Etapa 3 - Otimização da Solução
 
-Nesta segunda etapa do projeto, foi desenvolvido um **algoritmo construtivo** para gerar uma **solução inicial** viável para o problema de roteamento com restrições apresentado na Etapa 1.
+A partir da solução inicial gerada na Etapa 2, aplicamos uma heurística de melhoria local baseada no **2-opt**, buscando otimizar a sequência dos serviços dentro de cada rota, visando reduzir o custo total sem violar as restrições do problema.
 
-Um algoritmo construtivo parte de uma solução vazia e, a partir de critérios definidos, constrói iterativamente uma solução completa e factível, respeitando as restrições operacionais do problema.
+### 🔧 Funcionamento da Otimização
 
----
-
-
-## 🎯 Objetivo
-
-O objetivo principal desta etapa é produzir soluções iniciais que:
-
-✅ Atendam todas as demandas obrigatórias do grafo;
-
-✅ Não ultrapassem a capacidade dos veículos em cada rota;
-
-✅ Atribuam cada serviço a exatamente uma rota;
-
-✅ Não dupliquem o custo ou demanda de um serviço, mesmo que ele seja percorrido mais de uma vez.
+- Após a geração das rotas pelo **Path Scanning**, cada rota é submetida ao algoritmo **2-opt**, que tenta melhorar a ordem de visita dos serviços, eliminando cruzamentos e percursos desnecessários.
+- O **2-opt** realiza trocas de pares de arestas dentro da mesma rota, mantendo a viabilidade da solução.
+- Essa otimização reduz o custo total das rotas, resultando em soluções mais eficientes.
 
 ---
 
-## 🔧 Funcionalidades Implementadas - Algoritmo Construtivo baseado na heurística **Path Scanning**
+## 🎯 Objetivos da Etapa 3
 
-O algoritmo implementado na Etapa 2 segue os seguintes princípios:
+✅ Reduzir o custo total da solução inicial  
+✅ Manter a viabilidade das rotas (sem exceder a capacidade dos veículos)  
+✅ Preservar o atendimento de todos os serviços obrigatórios  
+✅ Aumentar a qualidade da solução com baixo custo computacional  
 
-📥 Inicia com uma solução vazia;
+---
 
-🔄 Iterativamente seleciona os serviços a serem atendidos;
+## 🔧 Funcionalidades Implementadas
 
-🧩 Agrupa os serviços em rotas respeitando a capacidade dos veículos;
-
-🔁 Se um arco, aresta ou vértice for visitado mais de uma vez, a demanda e custo associados ao serviço são contabilizados apenas uma vez;
-
-✅ Ao final, é garantido que todas as restrições do problema estão sendo respeitadas.
+- 📥 Geração de solução inicial com **Path Scanning**  
+- 🔧 Otimização das rotas com **2-opt**  
+- 🔄 Processamento de múltiplas rotas, aplicando melhoria local em cada uma delas  
+- ✅ Validação final das soluções otimizadas, garantindo que continuam respeitando todas as restrições  
 
 ---
 
 ## 🚀 Como Usar?
 
 ### ▶️ Execução
-Para rodar o algoritmo e gerar uma solução:
+Para rodar o algoritmo e gerar as soluções:
 
 ```bash
-python main.py nome_instancia.dat`
+python main.py 
 ```
 ### 💾 Saída
 As soluções geradas são salvas no diretório **Solucoes** no formato padrão especificado pelo professor, com o seguinte formato de nome:
